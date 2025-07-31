@@ -1,0 +1,57 @@
+---
+alwaysApply: false
+---
+## Princípios Fundamentais
+  - Escreva respostas concisas e técnicas com exemplos PHP precisos.
+  - Siga os padrões de codificação e melhores práticas do WordPress.
+  - Use programação orientada a objetos quando apropriado, focando na modularidade.
+  - Prefira iteração e modularização ao invés de duplicação.
+  - Use nomes descritivos para funções, variáveis e arquivos.
+  - Use letras minúsculas com hífens para diretórios (ex: wp-content/themes/meu-tema).
+  - Favoreça hooks (actions e filters) para estender funcionalidades.
+  
+## Dependências
+  - WordPress (última versão estável)
+  - Composer para gerenciamento de dependências (ao construir plugins ou temas avançados)
+  
+## Melhores Práticas do WordPress
+  - Use hooks do WordPress (actions e filters) ao invés de modificar arquivos do núcleo.
+  - Implemente funções de tema adequadas usando functions.php.
+  - Use o sistema de papéis e capacidades de usuário integrado do WordPress.
+  - Utilize a API de transients do WordPress para cache.
+  - Implemente processamento em segundo plano para tarefas longas usando wp_cron().
+  - Use as ferramentas de teste integradas do WordPress (WP_UnitTestCase) para testes unitários.
+  - Implemente internacionalização e localização adequadas usando funções i18n do WordPress.
+  - Implemente medidas de segurança adequadas (nonces, escape de dados, sanitização de entrada).
+  - Use wp_enqueue_script() e wp_enqueue_style() para gerenciamento adequado de assets.
+  - Implemente custom post types e taxonomias quando apropriado.
+  - Use a API de opções integrada do WordPress para armazenar dados de configuração.
+  - Implemente paginação adequada usando funções como paginate_links().
+
+## PHP/WordPress
+  - Use recursos do PHP 7.4+ quando apropriado (ex: propriedades tipadas, arrow functions).
+  - Siga os Padrões de Codificação PHP do WordPress.
+  - Use tipagem estrita quando possível: declare(strict_types=1);
+  - Utilize funções e APIs do núcleo do WordPress quando disponíveis.
+  - Estrutura de arquivos: Siga as estruturas de diretório e convenções de nomenclatura de temas e plugins do WordPress.
+  - Implemente tratamento de erros e logging adequados:
+    - Use recursos de logging de debug do WordPress.
+    - Crie manipuladores de erro personalizados quando necessário.
+    - Use blocos try-catch para exceções esperadas.
+  - Use funções integradas do WordPress para validação e sanitização de dados.
+  - Implemente verificação de nonce adequada para submissões de formulário.
+  - Utilize a camada de abstração de banco de dados do WordPress (wpdb) para interações com banco.
+  - Use declarações prepare() para consultas seguras ao banco de dados.
+  - Implemente mudanças de esquema de banco adequadas usando a função dbDelta().
+ 
+## Convenções Principais
+  1. Siga a API de plugins do WordPress para estender funcionalidades.
+  2. Use a hierarquia de templates do WordPress para desenvolvimento de temas.
+  3. Implemente sanitização e validação de dados adequadas usando funções do WordPress.
+  4. Use template tags e conditional tags do WordPress em temas.
+  5. Implemente consultas de banco adequadas usando $wpdb ou WP_Query.
+  6. Use funções de autenticação e autorização do WordPress.
+  7. Implemente manipulação AJAX adequada usando admin-ajax.php ou REST API.
+  8. Use o sistema de hooks do WordPress para código modular e extensível.
+  9. Implemente operações de banco adequadas usando funções transacionais do WordPress.
+  10. Use a API WP_Cron do WordPress para agendar tarefas.

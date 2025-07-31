@@ -1,0 +1,83 @@
+{
+    "apiVersion": 2,
+    "name": "cupompromo/coupon-grid",
+    "title": "Grid de Cupons",
+    "category": "cupompromo",
+    "icon": "grid-view",
+    "description": "Exibe um grid de cupons de desconto com filtros e paginação.",
+    "keywords": ["cupom", "desconto", "grid", "lojas"],
+    "supports": {
+        "html": false,
+        "align": ["wide", "full"],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        }
+    },
+    "attributes": {
+        "columns": {
+            "type": "number",
+            "default": 3
+        },
+        "limit": {
+            "type": "number",
+            "default": 12
+        },
+        "store_id": {
+            "type": "number",
+            "default": 0
+        },
+        "category_id": {
+            "type": "number",
+            "default": 0
+        },
+        "coupon_type": {
+            "type": "string",
+            "default": ""
+        },
+        "orderby": {
+            "type": "string",
+            "default": "created_at"
+        },
+        "order": {
+            "type": "string",
+            "default": "DESC"
+        },
+        "show_filters": {
+            "type": "boolean",
+            "default": true
+        },
+        "show_pagination": {
+            "type": "boolean",
+            "default": true
+        },
+        "featured_only": {
+            "type": "boolean",
+            "default": false
+        },
+        "card_style": {
+            "type": "string",
+            "default": "default"
+        },
+        "align": {
+            "type": "string",
+            "default": ""
+        },
+        "backgroundColor": {
+            "type": "string"
+        },
+        "textColor": {
+            "type": "string"
+        },
+        "gradient": {
+            "type": "string"
+        },
+        "style": {
+            "type": "object"
+        }
+    },
+    "textdomain": "cupompromo",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+} 

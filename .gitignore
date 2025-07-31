@@ -1,0 +1,47 @@
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos de log
+*.log
+logs/
+
+# Arquivos temporários
+tmp/
+temp/
+*.tmp
+
+# Arquivos de configuração local
+wp-config.php
+.env
+
+# Arquivos de upload (se houver)
+uploads/
+
+# Arquivos de cache
+cache/
+*.cache
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Arquivos de dependências (se usar composer)
+vendor/
+composer.lock
+
+# Arquivos de build
+build/
+dist/
+node_modules/
+
+# Arquivos de teste
+tests/coverage/
+.phpunit.result.cache 

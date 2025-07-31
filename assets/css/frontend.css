@@ -1,0 +1,268 @@
+/**
+ * Estilos CSS para o frontend do plugin Cupom Promo
+ *
+ * @package CupomPromo
+ * @since 1.0.0
+ */
+
+/* Container principal do formulário */
+.cupom-promo-form {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    max-width: 500px;
+}
+
+.cupom-promo-form h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Grupos de formulário */
+.cupom-promo-form .form-group {
+    margin-bottom: 15px;
+}
+
+.cupom-promo-form .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Campo de entrada */
+.cupom-promo-form input[type="text"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.cupom-promo-form input[type="text"]:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
+}
+
+.cupom-promo-form input[type="text"]::placeholder {
+    color: #999;
+}
+
+/* Botão de aplicar */
+.cupom-promo-btn {
+    width: 100%;
+    background: #0073aa;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cupom-promo-btn:hover {
+    background: #005a87;
+}
+
+.cupom-promo-btn:active {
+    transform: translateY(1px);
+}
+
+.cupom-promo-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Resultado da validação */
+.cupom-result {
+    margin-top: 15px;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-align: center;
+    display: none;
+}
+
+.cupom-result.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    display: block;
+}
+
+.cupom-result.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    display: block;
+}
+
+.cupom-result.info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    display: block;
+}
+
+/* Loading state */
+.cupom-promo-form.loading .cupom-promo-btn {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.cupom-promo-form.loading .cupom-promo-btn::after {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Variações de estilo */
+.cupom-promo-form.style-minimal {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.cupom-promo-form.style-minimal .form-group {
+    display: flex;
+    gap: 10px;
+}
+
+.cupom-promo-form.style-minimal input[type="text"] {
+    flex: 1;
+}
+
+.cupom-promo-form.style-minimal .cupom-promo-btn {
+    width: auto;
+    white-space: nowrap;
+}
+
+.cupom-promo-form.style-card {
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.cupom-promo-form.style-card h3 {
+    color: #0073aa;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 10px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .cupom-promo-form {
+        padding: 15px;
+    }
+    
+    .cupom-promo-form h3 {
+        font-size: 16px;
+    }
+    
+    .cupom-promo-form input[type="text"],
+    .cupom-promo-btn {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    
+    .cupom-promo-form.style-minimal .form-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .cupom-promo-form.style-minimal .cupom-promo-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .cupom-promo-form {
+        padding: 12px;
+        margin: 15px 0;
+    }
+}
+
+/* Animações */
+.cupom-result {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estados de foco melhorados */
+.cupom-promo-form input[type="text"]:focus {
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.2);
+}
+
+/* Estilos para diferentes temas */
+.cupom-promo-form.theme-dark {
+    background: #333;
+    border-color: #555;
+    color: white;
+}
+
+.cupom-promo-form.theme-dark h3 {
+    color: white;
+}
+
+.cupom-promo-form.theme-dark input[type="text"] {
+    background: #444;
+    border-color: #666;
+    color: white;
+}
+
+.cupom-promo-form.theme-dark input[type="text"]::placeholder {
+    color: #aaa;
+}
+
+.cupom-promo-form.theme-dark .cupom-promo-btn {
+    background: #0073aa;
+}
+
+/* Estilos para sucesso/erro específicos */
+.cupom-result.success {
+    animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.cupom-result.error {
+    animation: errorShake 0.5s ease;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+} 

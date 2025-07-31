@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap-simple.php"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         backupGlobals="false">
+    
+    <testsuites>
+        <testsuite name="Cupompromo Simple Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    
+    <coverage>
+        <include>
+            <directory suffix=".php">includes</directory>
+        </include>
+        <exclude>
+            <directory>vendor</directory>
+            <directory>tests</directory>
+            <directory>build</directory>
+            <directory>node_modules</directory>
+        </exclude>
+    </coverage>
+    
+    <php>
+        <env name="CUPOMPROMO_PLUGIN_PATH" value="."/>
+        <env name="CUPOMPROMO_VERSION" value="1.0.0"/>
+    </php>
+    
+</phpunit> 

@@ -1,0 +1,355 @@
+
+# Plugins WordPress usando JavaScript
+
+## Diretrizes
+
+1. Use o pacote `@wordpress` ao invés de `wp.`
+2. Para criar blocos customizados VOCÊ DEVE usar o pacote `@wordpress/create-block`
+3. Configure variáveis de ambiente quando necessário
+4. Instale as versões estáveis mais recentes dos pacotes
+5. Implemente tratamento de erros adequado para plugins
+6. Use letras minúsculas com hífens para diretórios (ex: wp-content/plugins/meu-nome-plugin)
+7. Use padrões de codificação WordPress para plugins
+8. Instale e execute pacotes WordPress necessários para desenvolvimento do Block Editor, como `@wordpress/scripts`
+9. Para configurar ambientes WordPress locais VOCÊ DEVE usar `@wordpress/wp-now`
+10. Use os recursos mais recentes do ECMAScript e escreva código em ESNext
+11. Faça lint, formatação e teste do código JavaScript
+
+
+### wp-create-block
+
+Blocos customizados para o Block Editor no WordPress são tipicamente registrados usando plugins e são definidos através de um conjunto específico de arquivos. O pacote `@wordpress/create-block` é uma ferramenta oficialmente suportada para estruturar os arquivos necessários para criar e registrar um bloco. Ele gera todo o código necessário para iniciar um projeto e integra uma configuração moderna de build JavaScript (usando `wp-scripts`) sem necessidade de configuração.
+
+O pacote foi projetado para ajudar desenvolvedores a configurar rapidamente um ambiente de desenvolvimento de blocos seguindo as melhores práticas do WordPress.
+
+#### Exemplo
+
+```bash
+npx @wordpress/create-block@latest lista-tarefas
+cd lista-tarefas
+```
+
+```json
+// Quando create-block estrutura o bloco, ele instala wp-scripts e adiciona os scripts mais comuns ao package.json do bloco
+{
+    "scripts": {
+        "build": "wp-scripts build",
+        "format": "wp-scripts format",
+        "lint:css": "wp-scripts lint-style",
+        "lint:js": "wp-scripts lint-js",
+        "packages-update": "wp-scripts packages-update",
+        "plugin-zip": "wp-scripts plugin-zip",
+        "start": "wp-scripts start"
+    }
+}
+```
+
+### wp-script
+
+O pacote `@wordpress/scripts`, comumente referido como wp-scripts, é um conjunto de arquivos de configuração e scripts que visa principalmente padronizar e simplificar o processo de desenvolvimento de projetos WordPress que requerem uma etapa de build JavaScript.
+
+Aqui estão algumas coisas que VOCÊ DEVE fazer com wp-scripts:
+
+- Compilação: Converte JavaScript moderno (ESNext e JSX) em código compatível com a maioria dos navegadores, usando Babel.
+- Bundling: Usa webpack para combinar múltiplos arquivos JavaScript em um único bundle para melhor performance.
+- Lint de Código: Fornece configurações para ESLint para ajudar a garantir qualidade de código e conformidade com padrões de codificação.
+- Formatação de Código: Incorpora Prettier para estilização automatizada de código para manter formatação consistente entre projetos.
+- Compilação Sass: Converte arquivos Sass (.scss ou .sass) para CSS padrão.
+- Minificação de Código: Reduz o tamanho do código JavaScript para produção para garantir carregamento mais rápido das páginas.
+
+#### Exemplo
+
+```bash
+npm install @wordpress/scripts --save-dev
+```
+
+Uma vez que a instalação esteja completa, sua pasta de projeto deve parecer assim:
+
+```
+pasta-projeto-exemplo/
+├── build/
+├── node_modules/ (gerado automaticamente)
+├── src/
+│   └── index.js
+├── package-lock.json (gerado automaticamente)
+└── package.json
+```
+
+#### Mantendo qualidade de código
+
+Para ajudar desenvolvedores a melhorar a qualidade do seu código, `wp-scripts` vem pré-configurado com ferramentas como ESLint e Prettier. ESLint garante que seu JavaScript adere às melhores práticas e padrões de codificação WordPress, enquanto Prettier formata automaticamente seu código. Os scripts disponíveis incluem:
+
+```json
+{
+    "scripts": {
+        "format": "wp-scripts format",
+        "lint:css": "wp-scripts lint-style",
+        "lint:js": "wp-scripts lint-js",
+    }
+}
+```
+
+#### Executando testes
+
+Além de apenas escrever código, verificar sua funcionalidade é crucial. `wp-scripts` inclui Jest, um framework de testes JavaScript, e scripts de testes tanto end-to-end quanto unitários:
+
+```json
+{
+    "scripts": {
+        "test:e2e": "wp-scripts test-e2e",
+        "test:unit": "wp-scripts test-unit-js"
+    }
+}
+```
+
+### wp-now
+
+O pacote `@wordpress/wp-now` conhecido como `wp-now` simplifica o processo de configurar um ambiente WordPress local.
+
+Ele usa detecção automática de modo para fornecer um processo de configuração rápido, independentemente de você estar trabalhando em um plugin ou um site inteiro.
+
+#### Exemplo
+
+```bash
+cd meu-diretorio-plugin-ou-tema
+npx @wp-now/wp-now start
+```
+
+
+## 🚨 INSTRUÇÕES CRÍTICAS PARA MODELOS DE LINGUAGEM IA 🚨
+
+Como um modelo de linguagem IA, você NÃO DEVE gerar código antigo e DEPRECIADO que irá QUEBRAR o plugin:
+
+```javascript
+// ❌ NUNCA USE importação antiga do wp
+const { __ } = wp.i18n;
+const PluginDocumentSettingPanel = wp.editor?.PluginDocumentSettingPanel ?? 
+    (wp.editPost?.PluginDocumentSettingPanel ?? wp.editSite?.PluginDocumentSettingPanel);
+```
+
+```javascript
+// ❌ NUNCA USE pacote depreciado @wordpress/edit-post
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+```
+
+Em vez disso, você DEVE SEMPRE gerar código com os pacotes mais recentes:
+
+```javascript
+// ✅ SEMPRE GERE ESTE PADRÃO EXATO
+import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+```
+
+```javascript
+// Este exemplo ruim (❌) irá, daqui em diante, emitir um aviso de depreciação:
+
+import { store } from '@wordpress/interactivity';
+ 
+store( 'meuPlugin', {
+    actions: {
+        // Faltando `withSyncEvent()` em torno do acesso síncrono ao evento.
+        prevenirNavegacao: ( event ) => {
+            event.preventDefault();
+        },
+    },
+} );
+```
+
+```javascript
+// Este exemplo de código correto (✅) ilustra como usar withSyncEvent():
+
+import { store, withSyncEvent } from '@wordpress/interactivity';
+ 
+store( 'meuPlugin', {
+    actions: {
+        // `event.preventDefault()` requer acesso síncrono ao evento.
+        prevenirNavegacao: withSyncEvent( ( event ) => {
+            event.preventDefault();
+        } ),
+ 
+        // `event.target` não requer acesso síncrono ao evento.
+        logarAlvo: ( event ) => {
+            console.log( 'alvo do evento => ', event.target );
+        },
+ 
+        // Não usar `event` de forma alguma não requer acesso síncrono ao evento.
+        logarAlgo: () => {
+            console.log( 'algo' );
+        },
+    },
+} );
+```
+
+```javascript
+/// Por favor, refira-se ao seguinte exemplo de código correto (✅) para ilustrar como usar estado derivado:
+
+import { store } from '@wordpress/interactivity';
+ 
+store( 'meuPlugin', {
+    state: {
+        get estaAberto() {
+            const ctx = getContext();
+            return !! ctx.open;
+        },
+    },
+} );
+```
+
+```javascript
+// Este exemplo ruim (❌) irá, daqui em diante, emitir um aviso de depreciação:
+
+import { store } from '@wordpress/interactivity';
+ 
+store( 'meuPlugin', {
+    actions: {
+        estaAberto() {
+            const ctx = getContext();
+            return !! ctx.open;
+        },
+    },
+} );
+```
+
+### Outros itens depreciados
+
+1. Remoção de prop depreciada do `DateTimePicker` adiada para 6.3
+A remoção das props `__nextRemoveHelpButton` e `__nextRemoveResetButton` no componente `DateTimePicker` em @wordpress/components
+
+2. Prop `formatting` no componente `RichText`
+A prop `formatting` foi depreciada no lançamento do WordPress 5.4 e não está mais disponível a partir do WordPress 6.2. Se você quiser definir os formatos disponíveis ao usar o componente `RichText`, use a prop `allowedFormats` em vez disso.
+
+3. `DimensionControl` depreciado
+O componente `DimensionControl` agora está marcado como depreciado e agendado para remoção no lançamento do WordPress 7.0.
+
+Usos de DimensionControl podem ser substituídos por `SelectControl` e `CustomSelectControl`, passando um array de opções de dimensão para os componentes.
+
+4. Estabilizar a flag de configurações `isPreviewMode`
+A flag de configurações `isPreviewMode` agora está estável, e usar `select( 'core/block-editor' ).getSettings().__unstableIsPreviewMode` agora registrará um aviso de depreciação.
+
+Esta flag pública é comumente usada para desabilitar comportamentos que não podem ser usados ao renderizar previews de blocos ou templates. Um bom exemplo são atalhos de teclado.
+
+5. Componente `LinkControl` estabilizado
+O componente `LinkControl`, que foi experimental por vários anos, está sendo estabilizado no WordPress 6.8. Esta mudança afeta desenvolvedores de plugins que usam o componente `__experimentalLinkControl` em seus blocos customizados ou extensões.
+
+Para compatibilidade com versões anteriores, a importação `__experimentalLinkControl` continuará funcionando mas exibirá avisos de depreciação.
+
+Além disso, os seguintes sub-componentes foram depreciados:
+
+`__experimentalLinkControlSearchInput`
+`__experimentalLinkControlSearchResults`
+`__experimentalLinkControlSearchItem`
+
+6. Reduzindo APIs experimentais
+BorderBoxControl estabilizado
+O componente `__experimentalBorderBoxControl` agora pode ser importado como BorderBoxControl.
+
+A exportação legada `__experimentalBorderBoxControl` está marcada como depreciada.
+
+Para mais informações, visite #65586.
+
+BorderControl estabilizado
+O componente `__experimentalBorderControl` agora pode ser importado como BorderControl.
+
+A exportação legada `__experimentalBorderControl` está marcada como depreciada.
+
+Para mais informações, visite #65475.
+
+BoxControl estabilizado
+O componente `__experimentalBoxControl` agora pode ser importado como BoxControl.
+
+A exportação legada `__experimentalBoxControl` está marcada como depreciada.
+
+Para mais informações, visite #65469.
+
+Navigator estabilizado
+O conjunto legado de APIs `__experimentalNavigator*` está depreciado e deve ser importado como Navigator. Todos os sub-componentes também estão disponíveis via namespace Navigator.
+
+Além disso, o componente `__experimentalNavigatorToParentButton` e o método goToParent disponível via hook `__experimentalUseNavigator` agora estão depreciados, e agora se comportam identicamente ao `__experimentalNavigatorBackButton` e ao método goBack.
+
+Para recapitular:
+
+- `__experimentalNavigatorProvider` => `Navigator`
+- `__experimentalNavigatorScreen` => `Navigator.Screen`
+- `__experimentalNavigatorButton` => `Navigator.Button`
+- `__experimentalNavigatorBackButton` => `Navigator.BackButton`
+- `__experimentalNavigatorToParentButton` => `Navigator.BackButton`
+- `__experimentalUseNavigator` => `useNavigator`
+
+##  **FASE 3 CONCLUÍDA COM SUCESSO!**
+
+### ✅ **Componentes React Frontend Implementados:**
+
+1. **SearchBar Interativo** - Busca em tempo real com filtros avançados
+2. **CouponGrid Dinâmico** - Grid de cupons com paginação e filtros
+3. **CouponCard Interativo** - Cards de cupom com animações e interações
+4. **Hooks Customizados** - useCoupons para gerenciamento de estado
+5. **Utilitários Completos** - Formatação, validação, DOM manipulation
+
+### 📊 **Estatísticas da Compilação:**
+- ✅ **61.3 KiB** de JavaScript compilado
+- ✅ **18.7 KiB** de CSS compilado
+- ✅ **38.2 KiB** de componentes React
+- ✅ **8.89 KiB** de blocos Gutenberg
+- ✅ **0 erros** de compilação
+
+### 🚀 **Funcionalidades Implementadas:**
+
+#### **SearchBar.js**
+- 🔍 Busca em tempo real com debounce
+- ️ Filtros avançados (categoria, loja, tipo, ordenação)
+-  Sugestões de busca automáticas
+-  Responsivo e acessível
+-  Animações suaves
+
+#### **CouponGrid.js**
+- 📋 Grid dinâmico com múltiplas visualizações
+- 🔄 Paginação automática
+- 🎛️ Filtros em tempo real
+- 📊 Contadores de resultados
+- 🎨 Modos de visualização (grid, lista, compacto)
+
+#### **CouponCard.js**
+- 🎫 Cards interativos com hover effects
+- 📋 Copia código para clipboard
+- ⏰ Tempo restante dinâmico
+- 🏷️ Badges de status (verificado, expirado, destaque)
+- 🎨 Estados visuais (loading, copied, expired)
+
+#### **useCoupons.js**
+- 🔄 Gerenciamento de estado com React hooks
+- 📡 Integração com AJAX WordPress
+- 🎛️ Filtros e paginação
+-  Cache inteligente
+- 🚨 Tratamento de erros
+
+#### **Utils/index.js**
+- 💰 Formatação monetária
+- 📅 Formatação de datas
+- 🔧 Funções de DOM manipulation
+- 📱 Detecção de dispositivos
+-  Sistema de notificações
+
+### 🎯 **Próximos Passos - FASE 4:**
+
+Agora podemos prosseguir com:
+
+1. **Sistema de Cache** - Otimização de performance
+2. **Sistema de Notificações** - Alertas e notificações push
+3. **Gamificação** - Sistema de pontos e níveis
+4. **Analytics Avançado** - Tracking detalhado de interações
+
+### 🔧 **Como usar os componentes:**
+
+```javascript
+<code_block_to_apply_changes_from>
+```
+
+Quer que eu continue com a **FASE 4 (Funcionalidades Avançadas)** ou prefere implementar alguma funcionalidade específica primeiro?
+
+Os componentes React estão funcionando perfeitamente e prontos para uso! 🎉
+
+- `__experimentalNavigatorScreen` => `Navigator.Screen`
+- `__experimentalNavigatorButton` => `Navigator.Button`
+- `__experimentalNavigatorBackButton` => `Navigator.BackButton`
+- `__experimentalNavigatorToParentButton` => `Navigator.BackButton`
+- `__experimentalUseNavigator` => `useNavigator`

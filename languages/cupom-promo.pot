@@ -1,0 +1,533 @@
+# Copyright (C) 2024 Seu Nome
+# This file is distributed under the same license as the Cupom Promo package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Cupom Promo 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/seu-usuario/cupompromo\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: cupom-promo.php:45
+msgid "Cupom Promo"
+msgstr ""
+
+#: cupom-promo.php:46
+msgid "Cupons"
+msgstr ""
+
+#: cupom-promo.php:47
+msgid "Relatórios"
+msgstr ""
+
+#: cupom-promo.php:48
+msgid "Configurações"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:45
+msgid "Cupom Promo"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:52
+msgid "Cupons"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:59
+msgid "Relatórios"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:66
+msgid "Configurações"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:95
+msgid "Tem certeza que deseja excluir este cupom?"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:96
+msgid "Salvando..."
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:97
+msgid "Salvo com sucesso!"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:98
+msgid "Erro ao salvar."
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:120
+msgid "Erro de segurança."
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:125
+msgid "Permissão negada."
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:145
+msgid "Cupom salvo com sucesso!"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:149
+msgid "Erro ao salvar cupom."
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:165
+msgid "Cupom excluído com sucesso!"
+msgstr ""
+
+#: includes/class-cupom-promo-admin.php:169
+msgid "Erro ao excluir cupom."
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:45
+msgid "Validando..."
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:46
+msgid "Cupom válido!"
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:47
+msgid "Cupom inválido."
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:48
+msgid "Cupom expirado."
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:49
+msgid "Cupom já foi utilizado."
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:70
+msgid "Erro de segurança."
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:76
+msgid "Por favor, insira um código de cupom."
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:95
+msgid "Aplicar Cupom"
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:96
+msgid "Digite seu cupom"
+msgstr ""
+
+#: includes/class-cupom-promo-frontend.php:97
+msgid "Aplicar"
+msgstr ""
+
+#: includes/class-cupom-promo-coupon.php:120
+msgid "Cupom não encontrado."
+msgstr ""
+
+#: includes/class-cupom-promo-coupon.php:127
+msgid "Cupom inativo."
+msgstr ""
+
+#: includes/class-cupom-promo-coupon.php:133
+msgid "Cupom ainda não está disponível."
+msgstr ""
+
+#: includes/class-cupom-promo-coupon.php:139
+msgid "Cupom expirado."
+msgstr ""
+
+#: includes/class-cupom-promo-coupon.php:145
+msgid "Cupom já foi utilizado o número máximo de vezes."
+msgstr ""
+
+#: includes/class-cupom-promo-coupon.php:151
+msgid "Cupom válido! Desconto de %s aplicado."
+msgstr ""
+
+#: admin/views/coupons-list.php:15
+msgid "Cupons"
+msgstr ""
+
+#: admin/views/coupons-list.php:16
+msgid "Adicionar Novo"
+msgstr ""
+
+#: admin/views/coupons-list.php:19
+msgid "Adicionar Cupom"
+msgstr ""
+
+#: admin/views/coupons-list.php:25
+msgid "Código do Cupom"
+msgstr ""
+
+#: admin/views/coupons-list.php:27
+msgid "Código único para o cupom (ex: DESCONTO10)"
+msgstr ""
+
+#: admin/views/coupons-list.php:32
+msgid "Tipo de Desconto"
+msgstr ""
+
+#: admin/views/coupons-list.php:35
+msgid "Selecione..."
+msgstr ""
+
+#: admin/views/coupons-list.php:36
+msgid "Porcentagem (%)"
+msgstr ""
+
+#: admin/views/coupons-list.php:37
+msgid "Valor Fixo (R$)"
+msgstr ""
+
+#: admin/views/coupons-list.php:42
+msgid "Valor do Desconto"
+msgstr ""
+
+#: admin/views/coupons-list.php:48
+msgid "Limite de Uso"
+msgstr ""
+
+#: admin/views/coupons-list.php:50
+msgid "0 = sem limite"
+msgstr ""
+
+#: admin/views/coupons-list.php:55
+msgid "Data de Início"
+msgstr ""
+
+#: admin/views/coupons-list.php:62
+msgid "Data de Fim"
+msgstr ""
+
+#: admin/views/coupons-list.php:69
+msgid "Status"
+msgstr ""
+
+#: admin/views/coupons-list.php:71
+msgid "Ativo"
+msgstr ""
+
+#: admin/views/coupons-list.php:72
+msgid "Inativo"
+msgstr ""
+
+#: admin/views/coupons-list.php:77
+msgid "Salvar Cupom"
+msgstr ""
+
+#: admin/views/coupons-list.php:78
+msgid "Cancelar"
+msgstr ""
+
+#: admin/views/coupons-list.php:85
+msgid "Ações em massa"
+msgstr ""
+
+#: admin/views/coupons-list.php:86
+msgid "Excluir"
+msgstr ""
+
+#: admin/views/coupons-list.php:87
+msgid "Aplicar"
+msgstr ""
+
+#: admin/views/coupons-list.php:95
+msgid "Código"
+msgstr ""
+
+#: admin/views/coupons-list.php:96
+msgid "Desconto"
+msgstr ""
+
+#: admin/views/coupons-list.php:97
+msgid "Uso"
+msgstr ""
+
+#: admin/views/coupons-list.php:98
+msgid "Período"
+msgstr ""
+
+#: admin/views/coupons-list.php:99
+msgid "Status"
+msgstr ""
+
+#: admin/views/coupons-list.php:100
+msgid "Ações"
+msgstr ""
+
+#: admin/views/coupons-list.php:104
+msgid "Nenhum cupom encontrado."
+msgstr ""
+
+#: admin/views/coupons-list.php:130
+msgid "Início:"
+msgstr ""
+
+#: admin/views/coupons-list.php:133
+msgid "Fim:"
+msgstr ""
+
+#: admin/views/coupons-list.php:136
+msgid "Sem período definido"
+msgstr ""
+
+#: admin/views/coupons-list.php:142
+msgid "Ativo"
+msgstr ""
+
+#: admin/views/coupons-list.php:143
+msgid "Inativo"
+msgstr ""
+
+#: admin/views/coupons-list.php:146
+msgid "Editar"
+msgstr ""
+
+#: admin/views/coupons-list.php:147
+msgid "Excluir"
+msgstr ""
+
+#: admin/views/reports.php:15
+msgid "Relatórios"
+msgstr ""
+
+#: admin/views/reports.php:21
+msgid "Total de Cupons"
+msgstr ""
+
+#: admin/views/reports.php:28
+msgid "Cupons Ativos"
+msgstr ""
+
+#: admin/views/reports.php:42
+msgid "Total de Usos"
+msgstr ""
+
+#: admin/views/reports.php:48
+msgid "Total de Descontos"
+msgstr ""
+
+#: admin/views/reports.php:56
+msgid "Uso por Cupom"
+msgstr ""
+
+#: admin/views/reports.php:62
+msgid "Relatório Detalhado"
+msgstr ""
+
+#: admin/views/reports.php:68
+msgid "Código"
+msgstr ""
+
+#: admin/views/reports.php:69
+msgid "Desconto"
+msgstr ""
+
+#: admin/views/reports.php:70
+msgid "Usos"
+msgstr ""
+
+#: admin/views/reports.php:71
+msgid "Limite"
+msgstr ""
+
+#: admin/views/reports.php:72
+msgid "Status"
+msgstr ""
+
+#: admin/views/reports.php:73
+msgid "Último Uso"
+msgstr ""
+
+#: admin/views/reports.php:95
+msgid "Sem limite"
+msgstr ""
+
+#: admin/views/reports.php:102
+msgid "Ativo"
+msgstr ""
+
+#: admin/views/reports.php:103
+msgid "Inativo"
+msgstr ""
+
+#: admin/views/reports.php:108
+msgid "N/A"
+msgstr ""
+
+#: admin/views/reports.php:115
+msgid "Exportar Relatórios"
+msgstr ""
+
+#: admin/views/reports.php:116
+msgid "Exporte os dados dos cupons em diferentes formatos:"
+msgstr ""
+
+#: admin/views/reports.php:119
+msgid "Exportar CSV"
+msgstr ""
+
+#: admin/views/reports.php:120
+msgid "Exportar PDF"
+msgstr ""
+
+#: admin/views/settings.php:15
+msgid "Configurações do Cupom Promo"
+msgstr ""
+
+#: admin/views/settings.php:25
+msgid "Integração com WooCommerce"
+msgstr ""
+
+#: admin/views/settings.php:27
+msgid "Ativar integração com WooCommerce"
+msgstr ""
+
+#: admin/views/settings.php:28
+msgid "Permite aplicar cupons automaticamente nos pedidos do WooCommerce."
+msgstr ""
+
+#: admin/views/settings.php:33
+msgid "Tipo de Desconto Padrão"
+msgstr ""
+
+#: admin/views/settings.php:36
+msgid "Porcentagem (%)"
+msgstr ""
+
+#: admin/views/settings.php:37
+msgid "Valor Fixo"
+msgstr ""
+
+#: admin/views/settings.php:38
+msgid "Tipo de desconto padrão ao criar novos cupons."
+msgstr ""
+
+#: admin/views/settings.php:43
+msgid "Símbolo da Moeda"
+msgstr ""
+
+#: admin/views/settings.php:45
+msgid "Símbolo da moeda para exibição dos valores (ex: R$, $, €)."
+msgstr ""
+
+#: admin/views/settings.php:50
+msgid "Notificações por Email"
+msgstr ""
+
+#: admin/views/settings.php:52
+msgid "Enviar notificações por email"
+msgstr ""
+
+#: admin/views/settings.php:53
+msgid "Envia emails quando cupons são utilizados ou expiram."
+msgstr ""
+
+#: admin/views/settings.php:58
+msgid "Email do Administrador"
+msgstr ""
+
+#: admin/views/settings.php:60
+msgid "Email para receber notificações sobre cupons."
+msgstr ""
+
+#: admin/views/settings.php:65
+msgid "Gerar Códigos Automaticamente"
+msgstr ""
+
+#: admin/views/settings.php:67
+msgid "Gerar códigos de cupom automaticamente"
+msgstr ""
+
+#: admin/views/settings.php:68
+msgid "Gera códigos únicos automaticamente ao criar cupons."
+msgstr ""
+
+#: admin/views/settings.php:73
+msgid "Prefixo dos Códigos"
+msgstr ""
+
+#: admin/views/settings.php:75
+msgid "Prefixo para códigos gerados automaticamente."
+msgstr ""
+
+#: admin/views/settings.php:80
+msgid "Comprimento dos Códigos"
+msgstr ""
+
+#: admin/views/settings.php:82
+msgid "Comprimento dos códigos gerados automaticamente (4-20 caracteres)."
+msgstr ""
+
+#: admin/views/settings.php:87
+msgid "Configurações Avançadas"
+msgstr ""
+
+#: admin/views/settings.php:91
+msgid "Limpar Dados"
+msgstr ""
+
+#: admin/views/settings.php:93
+msgid "Limpar Todos os Cupons"
+msgstr ""
+
+#: admin/views/settings.php:94
+msgid "Remove todos os cupons e dados de uso. Esta ação não pode ser desfeita!"
+msgstr ""
+
+#: admin/views/settings.php:99
+msgid "Exportar Configurações"
+msgstr ""
+
+#: admin/views/settings.php:101
+msgid "Exportar Configurações"
+msgstr ""
+
+#: admin/views/settings.php:102
+msgid "Exporta as configurações atuais do plugin."
+msgstr ""
+
+#: admin/views/settings.php:107
+msgid "Importar Configurações"
+msgstr ""
+
+#: admin/views/settings.php:109
+msgid "Importar Configurações"
+msgstr ""
+
+#: admin/views/settings.php:110
+msgid "Importa configurações de um arquivo JSON."
+msgstr ""
+
+#: admin/views/settings.php:115
+msgid "Salvar Configurações"
+msgstr ""
+
+#: admin/views/settings.php:125
+msgid "Tem certeza que deseja limpar todos os dados dos cupons? Esta ação não pode ser desfeita!"
+msgstr ""
+
+#: admin/views/settings.php:129
+msgid "Funcionalidade em desenvolvimento."
+msgstr ""
+
+#: admin/views/settings.php:135
+msgid "Funcionalidade em desenvolvimento."
+msgstr ""
+
+#: admin/views/settings.php:141
+msgid "Funcionalidade em desenvolvimento."
+msgstr ""
+
+#: admin/views/settings.php:147
+msgid "Funcionalidade em desenvolvimento."
+msgstr ""
+
+#: admin/views/settings.php:20
+msgid "Configurações salvas com sucesso!"
+msgstr "" 

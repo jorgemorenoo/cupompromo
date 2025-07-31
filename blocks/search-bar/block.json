@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "cupompromo/search-bar",
+    "version": "1.0.0",
+    "title": "Barra de Busca",
+    "category": "cupompromo",
+    "icon": "search",
+    "description": "Barra de busca para cupons e lojas com filtros avançados.",
+    "example": {
+        "attributes": {
+            "placeholder": "Buscar cupons de desconto...",
+            "show_filters": true,
+            "live_search": true
+        }
+    },
+    "supports": {
+        "html": false,
+        "align": ["wide", "full"],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        },
+        "color": {
+            "background": true,
+            "text": true
+        }
+    },
+    "attributes": {
+        "placeholder": {
+            "type": "string",
+            "default": "Buscar cupons de desconto..."
+        },
+        "show_filters": {
+            "type": "boolean",
+            "default": true
+        },
+        "live_search": {
+            "type": "boolean",
+            "default": true
+        },
+        "show_categories": {
+            "type": "boolean",
+            "default": true
+        },
+        "show_stores": {
+            "type": "boolean",
+            "default": true
+        },
+        "show_types": {
+            "type": "boolean",
+            "default": true
+        },
+        "button_text": {
+            "type": "string",
+            "default": "Buscar"
+        },
+        "search_page_url": {
+            "type": "string",
+            "default": ""
+        },
+        "align": {
+            "type": "string"
+        },
+        "backgroundColor": {
+            "type": "string"
+        },
+        "textColor": {
+            "type": "string"
+        },
+        "gradient": {
+            "type": "string"
+        },
+        "style": {
+            "type": "object"
+        }
+    },
+    "textdomain": "cupompromo",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css",
+    "render": "file:./render.php"
+} 

@@ -1,0 +1,55 @@
+{
+  "name": "cupompromo",
+  "version": "1.0.0",
+  "description": "Portal de cupons de desconto robusto e escalável para WordPress",
+  "main": "index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "lint:php": "vendor/bin/phpcs --standard=phpcs.xml",
+    "test": "vendor/bin/phpunit",
+    "test:coverage": "vendor/bin/phpunit --coverage-html coverage",
+    "dev": "concurrently \"npm run start\" \"npm run watch:scss\"",
+    "watch:scss": "sass --watch assets/scss:assets/css",
+    "build:scss": "sass assets/scss:assets/css --style=compressed",
+    "build:blocks": "npm run build:scss && npm run build",
+    "clean": "rm -rf build/ node_modules/ vendor/",
+    "install:all": "composer install && npm install"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "cupons",
+    "descontos",
+    "afiliados"
+  ],
+  "author": "Seu Nome",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/eslint-plugin": "^14.0.0",
+    "@wordpress/prettier-config": "^2.0.0",
+    "@wordpress/scripts": "^26.19.0",
+    "concurrently": "^8.0.0",
+    "sass": "^1.60.0"
+  },
+  "dependencies": {
+    "@wordpress/block-editor": "^12.0.0",
+    "@wordpress/blocks": "^12.0.0",
+    "@wordpress/components": "^25.0.0",
+    "@wordpress/data": "^9.0.0",
+    "@wordpress/element": "^5.0.0",
+    "@wordpress/hooks": "^3.0.0",
+    "@wordpress/i18n": "^4.0.0",
+    "@wordpress/url": "^3.0.0",
+    "classnames": "^2.3.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "prettier": "@wordpress/prettier-config"
+}

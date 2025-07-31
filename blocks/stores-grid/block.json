@@ -1,0 +1,88 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "cupompromo/stores-grid",
+    "version": "1.0.0",
+    "title": "Grid de Lojas",
+    "category": "cupompromo",
+    "icon": "grid-view",
+    "description": "Exibe um grid de lojas parceiras com cupons de desconto.",
+    "example": {
+        "attributes": {
+            "columns": 3,
+            "featured_only": false,
+            "limit": 6,
+            "card_style": "default"
+        }
+    },
+    "supports": {
+        "html": false,
+        "align": ["wide", "full"],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        },
+        "color": {
+            "background": true,
+            "text": true
+        }
+    },
+    "attributes": {
+        "columns": {
+            "type": "number",
+            "default": 3
+        },
+        "featured_only": {
+            "type": "boolean",
+            "default": false
+        },
+        "limit": {
+            "type": "number",
+            "default": 6
+        },
+        "card_style": {
+            "type": "string",
+            "default": "default"
+        },
+        "show_description": {
+            "type": "boolean",
+            "default": true
+        },
+        "show_coupons_count": {
+            "type": "boolean",
+            "default": true
+        },
+        "show_website_link": {
+            "type": "boolean",
+            "default": true
+        },
+        "orderby": {
+            "type": "string",
+            "default": "title"
+        },
+        "order": {
+            "type": "string",
+            "default": "ASC"
+        },
+        "align": {
+            "type": "string"
+        },
+        "backgroundColor": {
+            "type": "string"
+        },
+        "textColor": {
+            "type": "string"
+        },
+        "gradient": {
+            "type": "string"
+        },
+        "style": {
+            "type": "object"
+        }
+    },
+    "textdomain": "cupompromo",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css",
+    "render": "file:./render.php"
+} 
