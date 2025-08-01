@@ -352,4 +352,4 @@ Os componentes React estão funcionando perfeitamente e prontos para uso! 🎉
 - `__experimentalNavigatorButton` => `Navigator.Button`
 - `__experimentalNavigatorBackButton` => `Navigator.BackButton`
 - `__experimentalNavigatorToParentButton` => `Navigator.BackButton`
-- `__experimentalUseNavigator` => `useNavigator`
+- `__experimentalUseNavigator` => `useNavigator`    

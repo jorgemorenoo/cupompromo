@@ -1,0 +1,1121 @@
+# 🏗️ Arquitetura de APIs - Cupomzeiros
+
+## 📋 Visão Geral
+
+Este documento detalha a arquitetura completa de integração com APIs externas utilizada no plugin Cupomzeiros Cashback. Esta arquitetura pode ser replicada em outros projetos WordPress para criar sistemas robustos de integração com APIs.
+
+---
+
+## 🎯 **APIs INTEGRADAS**
+
+### **1. APIs de Afiliados (4 APIs)**
+- **Awin** - Cupons e programas de afiliados
+- **Admitad** - Campanhas e transações
+- **Afilio** - Conversões e tracking
+- **SocialSoul** - Lojas e vendas
+
+### **2. APIs de Serviços (6 APIs)**
+- **Cloudflare** - Cache e performance
+- **AwesomeAPI** - Cotação de moedas
+- **WebGlobal** - Links de produtos
+- **Lomadee** - Relatórios de transações
+- **Plugin Update Checker** - Atualizações
+- **CDNs Externos** - Assets e bibliotecas
+
+---
+
+## 🏛️ **ARQUITETURA BASE**
+
+### **1. Classe Base - RestClient**
+```php
+<?php
+/**
+ * RestClient - Classe base para todas as APIs
+ * 
+ * @package Wordpress
+ * @subpackage cpzcb
+ */
+namespace CPZCB;
+
+class RestClient {
+    protected $uri = null;
+    private $headers = [];
+    private $timeout = 30;
+    private $body_type = 'json';
+    private $debug = false;
+    public $status_code;
+    
+    /**
+     * Configurar URI base da API
+     */
+    public function set_uri(string $uri) {
+        $this->uri = $uri;
+    }
+    
+    /**
+     * Configurar headers da requisição
+     */
+    public function set_headers(array $headers) {
+        $this->headers = $headers;
+    }
+    
+    /**
+     * Configurar timeout da requisição
+     */
+    public function set_timeout(int $timeout) {
+        $this->timeout = $timeout;
+    }
+    
+    /**
+     * Configurar tipo de body (json ou query)
+     */
+    public function set_body_type(string $type) {
+        $this->body_type = $type;
+    }
+    
+    /**
+     * Processar resposta HTTP
+     */
+    protected function response($response): ?string {
+        if (is_wp_error($response)) {
+            return null;
+        }
+        
+        $response_code = (int) wp_remote_retrieve_response_code($response);
+        $this->status_code = $response_code;
+        
+        if ($response_code < 200 || $response_code >= 300) {
+            return null;
+        }
+        
+        return wp_remote_retrieve_body($response);
+    }
+    
+    /**
+     * Fazer requisição GET
+     */
+    public function get(string $path, array $query = []): ?array {
+        $url = $this->uri . $path;
+        
+        if (!empty($query)) {
+            $url .= '?' . http_build_query($query);
+        }
+        
+        $response = wp_remote_request($url, [
+            'method' => 'GET',
+            'timeout' => $this->timeout,
+            'headers' => $this->headers,
+        ]);
+        
+        $body = $this->response($response);
+        return $body ? json_decode($body, true) : null;
+    }
+    
+    /**
+     * Fazer requisição POST
+     */
+    public function post(string $path, array $body = []): ?array {
+        $url = $this->uri . $path;
+        
+        $request_body = $this->body_type === 'json' 
+            ? json_encode($body) 
+            : http_build_query($body);
+        
+        $headers = $this->headers;
+        if ($this->body_type === 'json') {
+            $headers['Content-Type'] = 'application/json';
+        }
+        
+        $response = wp_remote_request($url, [
+            'method' => 'POST',
+            'timeout' => $this->timeout,
+            'headers' => $headers,
+            'body' => $request_body,
+        ]);
+        
+        $body = $this->response($response);
+        return $body ? json_decode($body, true) : null;
+    }
+}
+```
+
+---
+
+## 🔌 **IMPLEMENTAÇÃO DAS APIS**
+
+### **1. Awin API**
+```php
+<?php
+namespace CPZCB\app\APIs\Awin;
+
+class API extends RestClient {
+    protected $access_token = '090f5e71-1b20-47cb-9aa6-e1cde8605ba6';
+    protected $publisher_id = '627035';
+    protected $type = 'publisher';
+    protected $base_api = 'https://api.awin.com';
+    
+    public function __construct() {
+        parent::set_uri($this->base_api);
+    }
+    
+    /**
+     * Testar conexão com a API
+     */
+    public function connect() {
+        try {
+            parent::set_headers(['Authorization' => 'Bearer ' . $this->access_token]);
+            $request = parent::get('/accounts/', [
+                'type' => $this->type
+            ]);
+            return $request ? true : false;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Buscar informações da conta
+     */
+    public function account() {
+        try {
+            parent::set_headers(['Authorization' => 'Bearer ' . $this->access_token]);
+            return parent::get('/accounts/', [
+                'type' => $this->type
+            ]);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Buscar advertiser específico
+     */
+    public function advertiser(int $advertiserId, $any = false) {
+        try {
+            parent::set_timeout(120);
+            parent::set_headers(['Authorization' => 'Bearer ' . $this->access_token]);
+            
+            $options['advertiserId'] = $advertiserId;
+            if ($any) $options['relationship'] = 'any';
+            
+            return parent::get('/publishers/' . urlencode($this->publisher_id) . '/programmedetails', $options);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Listar todos os advertisers
+     */
+    public function advertisers(array $options = []) {
+        try {
+            parent::set_timeout(120);
+            parent::set_headers(['Authorization' => 'Bearer ' . $this->access_token]);
+            
+            $options['relationship'] = 'joined';
+            return parent::get('/publishers/' . urlencode($this->publisher_id) . '/programmes', $options);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Buscar transação específica
+     */
+    public function order($transaction_id) {
+        try {
+            parent::set_timeout(120);
+            parent::set_headers(['Authorization' => 'Bearer ' . $this->access_token]);
+            
+            $transaction_id = is_array($transaction_id) ? implode(',', $transaction_id) : $transaction_id;
+            $options['ids'] = $transaction_id;
+            
+            $request = parent::get('/publishers/' . urlencode($this->publisher_id) . '/transactions/', $options);
+            return $request ? $request[0] : false;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Listar transações
+     */
+    public function orders(array $arr) {
+        try {
+            parent::set_timeout(120);
+            parent::set_headers(['Authorization' => 'Bearer ' . $this->access_token]);
+            
+            $options = array_merge([
+                'startDate' => date('Y-m-d', strtotime('-30 days')),
+                'endDate' => date('Y-m-d'),
+                'timezone' => 'Europe/London',
+                'dateFormat' => 'iso8601'
+            ], $arr);
+            
+            return parent::get('/publishers/' . urlencode($this->publisher_id) . '/transactions/', $options);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    
+    /**
+     * Buscar ofertas/cupons
+     */
+    public function offers(array $arr) {
+        try {
+            parent::set_timeout(120);
+            parent::set_headers(['Authorization' => 'Bearer ' . $this->access_token]);
+            
+            return parent::get('/publishers/' . urlencode($this->publisher_id) . '/offers/', $arr);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+}
+```
+
+### **2. Admitad API**
+```php
+<?php
+namespace CPZCB\app\APIs\Admitad;
+
+class API extends RestClient {
+    protected $clientID = 'bO2hw80hUI2njG6OVhP8Fp68CKoypS';
+    protected $clientSecret = 'fFKL5Xu5QvJsg6NecnfRvymC4tsBLB';
+    protected $websiteID = '1078216';
+    protected $base_api = 'https://api.admitad.com';
+    private $token;
+    
+    public function __construct() {
+        parent::set_uri($this->base_api);
+        $this->token = $this->token();
+    }
+    
+    /**
+     * Obter token de acesso
+     */
+    public function token() {
+        try {
+            $token = get_option('cpzcb_admitad_access');
+            if ($token && $token['expires'] > time()) {
+                return $token['token'];
+            }
+            return $this->get_token();
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Gerar novo token
+     */
+    public function get_token() {
+        try {
+            parent::set_body_type('query');
+            parent::set_headers([
+                'Authorization' => 'Basic ' . base64_encode($this->clientID . ":" . $this->clientSecret)
+            ]);
+            
+            $request = parent::post('/token/', [
+                'grant_type' => 'client_credentials',
+                'client_id' => $this->clientID,
+                'scope' => 'public_data advcampaigns statistics advcampaigns_for_website deeplink_generator coupons_for_website coupons'
+            ]);
+            
+            if (isset($request['access_token'])) {
+                update_option('cpzcb_admitad_access', [
+                    'token' => $request['access_token'],
+                    'expires' => time() + $request['expires_in']
+                ]);
+                return $request['access_token'];
+            }
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Buscar informações da conta
+     */
+    public function account() {
+        try {
+            parent::set_body_type('query');
+            parent::set_headers([
+                'Authorization' => 'Bearer ' . $this->token
+            ]);
+            
+            $response = parent::get('/me/');
+            return isset($response['first_name']) ? $response : [];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Buscar advertiser específico
+     */
+    public function advertiser(int $advertiserId) {
+        try {
+            parent::set_headers([
+                'Authorization' => 'Bearer ' . $this->token
+            ]);
+            
+            return parent::get('/advcampaigns/' . urlencode($advertiserId) . '/website/' . urlencode($this->websiteID) . '/');
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Listar advertisers
+     */
+    public function advertisers(array $options = []) {
+        try {
+            parent::set_headers([
+                'Authorization' => 'Bearer ' . $this->token
+            ]);
+            
+            $options['connection_status'] = 'active';
+            $options['limit'] = isset($options['limit']) ? $options['limit'] : 500;
+            
+            return parent::get('/advcampaigns/website/' . urlencode($this->websiteID) . '/', $options);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    
+    /**
+     * Listar transações
+     */
+    public function orders(array $options = []) {
+        try {
+            parent::set_headers([
+                'Authorization' => 'Bearer ' . $this->token
+            ]);
+            
+            $default_options = [
+                'start_date' => date('d.m.Y', strtotime('-30 days')),
+                'end_date' => date('d.m.Y'),
+                'limit' => 100
+            ];
+            
+            $options = array_merge($default_options, $options);
+            
+            return parent::get('/statistics/website/' . urlencode($this->websiteID) . '/actions/', $options);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+}
+```
+
+### **3. Afilio API**
+```php
+<?php
+namespace CPZCB\app\APIs\Afilio;
+
+class API extends RestClient {
+    protected $affid = 6490;
+    public static $canalid = 7612;
+    protected $token = 'kAYLAi6490';
+    protected $base_api = 'https://data.afilio.com.br';
+    
+    public function __construct() {
+        parent::set_uri($this->base_api);
+    }
+    
+    /**
+     * Testar conexão com a API
+     */
+    public function teste(array $options = []) {
+        try {
+            parent::set_timeout(60);
+            $options['token'] = $this->token;
+            $options['affid'] = $this->affid;
+            
+            $request = parent::get('/campaign', $options);
+            $request = !empty($request) ? $request[0] : false;
+            
+            return $request ? $request[array_key_first($request)] : [];
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Listar campanhas
+     */
+    public function advertisers(array $options = []) {
+        try {
+            parent::set_timeout(60);
+            $options['token'] = $this->token;
+            $options['affid'] = $this->affid;
+            
+            $request = parent::get('/campaign', $options);
+            $status_code = $this->status_code;
+            
+            // Log do status da requisição
+            $subject = sprintf('Afilio [%d]: %s', $status_code, wp_date('d/m/Y H:i:s'));
+            $message = sprintf('Afilio - Request %s', $status_code == 200 ? 'Sucesso' : 'Falha');
+            
+            $response = !empty($request) ? $request[0] : false;
+            $response = $response ? $response[array_key_first($response)] : [];
+            
+            if ($response) {
+                set_transient('api_response_Afilio', $response, 31 * MINUTE_IN_SECONDS);
+            }
+            
+            return $response;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Listar conversões
+     */
+    public function orders(array $options = []) {
+        try {
+            $options['token'] = $this->token;
+            $options['mode'] = 'JSON';
+            $options['affid'] = $this->affid;
+            $options['canalid'] = $this->canalid;
+            $options['dateStart'] = date('Y-m-d', strtotime($options['startDate']));
+            $options['DateEnd'] = date('Y-m-d', strtotime($options['endDate']));
+            
+            $request = parent::get('/conversoes', $options);
+            $request = !empty($request) ? $request[0] : false;
+            
+            return $request ? $request : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+}
+```
+
+### **4. SocialSoul API**
+```php
+<?php
+namespace CPZCB\app\APIs\SocialSoul;
+
+class API extends RestClient {
+    protected $base_api = 'https://api.socialsoul.com.vc/v3/';
+    protected $publisherID = '22774181';
+    protected $sourceId = '36295547';
+    private $app_token = '172730879006172eb1e62';
+    private $token = 'am9yZ2VAdXJ1ei5jb20uYnI6ZE40aU44bkc1ZEQxbVo5Zw';
+    
+    public function __construct() {
+        parent::set_uri($this->base_api);
+    }
+    
+    /**
+     * Listar lojas
+     */
+    public function advertisers(array $options = []) {
+        try {
+            $response = parent::get($this->app_token . '/store/_all', [
+                'sourceId' => $this->sourceId,
+                'hasOffer' => false
+            ]);
+            
+            return $response && isset($response['stores']) ? $response['stores'] : [];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Buscar transações via Lomadee
+     */
+    public function orders(array $options = []) {
+        try {
+            parent::set_uri('https://api.lomadee.com/api/lomadee');
+            
+            $options['token'] = $this->token;
+            $options['startDate'] = date('dmY', strtotime($options['startDate']));
+            $options['endDate'] = date('dmY', strtotime($options['endDate']));
+            $options['eventStatus'] = $options['status'];
+            $options['publisherId'] = $this->publisherID;
+            
+            $response = parent::get_xml('/reportTransaction', $options);
+            return $response && isset($response['item']) ? $response['item'] : [];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+}
+```
+
+---
+
+## 🔧 **SISTEMA DE CONFIGURAÇÃO**
+
+### **1. Gerenciamento de Credenciais**
+```php
+<?php
+namespace CPZCB\Config;
+
+class APICredentials {
+    // Constantes com valores padrão
+    const AWIN_ACCESS_TOKEN = '090f5e71-1b20-47cb-9aa6-e1cde8605ba6';
+    const AWIN_PUBLISHER_ID = '627035';
+    const ADMITAD_CLIENT_ID = 'bO2hw80hUI2njG6OVhP8Fp68CKoypS';
+    const ADMITAD_CLIENT_SECRET = 'fFKL5Xu5QvJsg6NecnfRvymC4tsBLB';
+    const AFILIO_AFFID = '6490';
+    const AFILIO_TOKEN = 'kAYLAi6490';
+    const SOCIALSOUL_PUBLISHER_ID = '22774181';
+    const SOCIALSOUL_APP_TOKEN = '172730879006172eb1e62';
+    
+    /**
+     * Obter credenciais de uma API específica
+     */
+    public static function get_credentials($api_name) {
+        $credentials = [
+            'awin' => [
+                'access_token' => defined('CPZCB_AWIN_TOKEN') ? CPZCB_AWIN_TOKEN : self::AWIN_ACCESS_TOKEN,
+                'publisher_id' => defined('CPZCB_AWIN_PUBLISHER') ? CPZCB_AWIN_PUBLISHER : self::AWIN_PUBLISHER_ID,
+            ],
+            'admitad' => [
+                'client_id' => defined('CPZCB_ADMITAD_CLIENT_ID') ? CPZCB_ADMITAD_CLIENT_ID : self::ADMITAD_CLIENT_ID,
+                'client_secret' => defined('CPZCB_ADMITAD_CLIENT_SECRET') ? CPZCB_ADMITAD_CLIENT_SECRET : self::ADMITAD_CLIENT_SECRET,
+                'website_id' => defined('CPZCB_ADMITAD_WEBSITE_ID') ? CPZCB_ADMITAD_WEBSITE_ID : self::ADMITAD_WEBSITE_ID,
+            ],
+            'afilio' => [
+                'affid' => defined('CPZCB_AFILIO_AFFID') ? CPZCB_AFILIO_AFFID : self::AFILIO_AFFID,
+                'token' => defined('CPZCB_AFILIO_TOKEN') ? CPZCB_AFILIO_TOKEN : self::AFILIO_TOKEN,
+                'canalid' => defined('CPZCB_AFILIO_CANALID') ? CPZCB_AFILIO_CANALID : self::AFILIO_CANALID,
+            ],
+            'socialsoul' => [
+                'publisher_id' => defined('CPZCB_SOCIALSOUL_PUBLISHER_ID') ? CPZCB_SOCIALSOUL_PUBLISHER_ID : self::SOCIALSOUL_PUBLISHER_ID,
+                'source_id' => defined('CPZCB_SOCIALSOUL_SOURCE_ID') ? CPZCB_SOCIALSOUL_SOURCE_ID : self::SOCIALSOUL_SOURCE_ID,
+                'app_token' => defined('CPZCB_SOCIALSOUL_APP_TOKEN') ? CPZCB_SOCIALSOUL_APP_TOKEN : self::SOCIALSOUL_APP_TOKEN,
+                'token' => defined('CPZCB_SOCIALSOUL_TOKEN') ? CPZCB_SOCIALSOUL_TOKEN : self::SOCIALSOUL_TOKEN,
+            ]
+        ];
+        
+        return isset($credentials[$api_name]) ? $credentials[$api_name] : [];
+    }
+}
+```
+
+---
+
+## 📊 **SISTEMA DE MONITORAMENTO**
+
+### **1. APIMonitor**
+```php
+<?php
+namespace CPZCB\APIManager;
+
+class APIMonitor {
+    const STATUS_ACTIVE = 'active';
+    const STATUS_DOWN = 'down';
+    const STATUS_SLOW = 'slow';
+    
+    private static $api_status = [];
+    
+    /**
+     * Verificar saúde da API
+     */
+    public static function check_api_health($api_name, $endpoint = null) {
+        $start_time = microtime(true);
+        
+        try {
+            switch ($api_name) {
+                case 'awin':
+                    $api = new \CPZCB\app\APIs\Awin\API();
+                    $response = $api->connect();
+                    break;
+                    
+                case 'admitad':
+                    $api = new \CPZCB\app\APIs\Admitad\API();
+                    $response = $api->account();
+                    break;
+                    
+                case 'afilio':
+                    $api = new \CPZCB\app\APIs\Afilio\API();
+                    $response = $api->teste();
+                    break;
+                    
+                case 'socialsoul':
+                    $api = new \CPZCB\app\APIs\SocialSoul\API();
+                    $response = $api->advertisers();
+                    break;
+                    
+                default:
+                    return false;
+            }
+            
+            $response_time = microtime(true) - $start_time;
+            $status = $response ? self::STATUS_ACTIVE : self::STATUS_DOWN;
+            
+            if ($response_time > 5.0) {
+                $status = self::STATUS_SLOW;
+            }
+            
+            self::$api_status[$api_name] = [
+                'status' => $status,
+                'response_time' => $response_time,
+                'last_check' => current_time('mysql'),
+                'available' => $response ? true : false
+            ];
+            
+            self::log_api_status($api_name, $status, $response_time);
+            return $response;
+            
+        } catch (Exception $e) {
+            self::$api_status[$api_name] = [
+                'status' => self::STATUS_DOWN,
+                'response_time' => 0,
+                'last_check' => current_time('mysql'),
+                'available' => false,
+                'error' => $e->getMessage()
+            ];
+            
+            self::log_api_status($api_name, self::STATUS_DOWN, 0, $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Obter status de uma API
+     */
+    public static function get_api_status($api_name = null) {
+        if ($api_name) {
+            return isset(self::$api_status[$api_name]) ? self::$api_status[$api_name] : null;
+        }
+        return self::$api_status;
+    }
+    
+    /**
+     * Obter APIs de fallback
+     */
+    public static function get_fallback_api($original_api) {
+        $fallbacks = [
+            'awin' => ['admitad', 'afilio'],
+            'admitad' => ['awin', 'socialsoul'],
+            'afilio' => ['awin', 'admitad'],
+            'socialsoul' => ['awin', 'admitad']
+        ];
+        
+        return isset($fallbacks[$original_api]) ? $fallbacks[$original_api] : [];
+    }
+    
+    /**
+     * Logar status da API
+     */
+    private static function log_api_status($api_name, $status, $response_time, $error = null) {
+        \CPZCB\Logging\Logger::info("API Status Check", [
+            'api' => $api_name,
+            'status' => $status,
+            'response_time' => $response_time,
+            'error' => $error
+        ]);
+    }
+}
+```
+
+### **2. RateLimiter**
+```php
+<?php
+namespace CPZCB\APIManager;
+
+class RateLimiter {
+    private static $limits = [
+        'awin' => ['requests' => 100, 'window' => 3600], // 100 requests/hour
+        'admitad' => ['requests' => 200, 'window' => 3600], // 200 requests/hour
+        'afilio' => ['requests' => 50, 'window' => 3600], // 50 requests/hour
+        'socialsoul' => ['requests' => 150, 'window' => 3600], // 150 requests/hour
+    ];
+    
+    /**
+     * Verificar se pode fazer requisição
+     */
+    public static function can_make_request($api_name) {
+        $cache_key = "cpzcb_rate_limit_{$api_name}";
+        $requests = wp_cache_get($cache_key, 'cpzcb_rate_limit');
+        
+        if (false === $requests) {
+            $requests = 0;
+        }
+        
+        $limit = self::$limits[$api_name] ?? ['requests' => 100, 'window' => 3600];
+        
+        if ($requests >= $limit['requests']) {
+            return false;
+        }
+        
+        wp_cache_set($cache_key, $requests + 1, 'cpzcb_rate_limit', $limit['window']);
+        return true;
+    }
+    
+    /**
+     * Aguardar se necessário
+     */
+    public static function wait_if_needed($api_name) {
+        while (!self::can_make_request($api_name)) {
+            sleep(1);
+        }
+    }
+}
+```
+
+---
+
+## 💾 **SISTEMA DE CACHE**
+
+### **1. APICache**
+```php
+<?php
+namespace CPZCB\APIManager;
+
+class APICache {
+    const CACHE_TIME = 1800; // 30 minutos para APIs
+    
+    /**
+     * Obter dados da API com cache
+     */
+    public static function get_api_data($api_name, $endpoint, $params = []) {
+        $cache_key = "cpzcb_api_{$api_name}_{$endpoint}_" . md5(serialize($params));
+        $cached_data = \CPZCB\Cache\CacheManager::get($cache_key);
+        
+        if (false === $cached_data) {
+            // Verificar rate limiting
+            \CPZCB\APIManager\RateLimiter::wait_if_needed($api_name);
+            
+            // Fazer requisição para API
+            $api_data = self::make_api_request($api_name, $endpoint, $params);
+            
+            if ($api_data) {
+                \CPZCB\Cache\CacheManager::set($cache_key, $api_data, self::CACHE_TIME);
+            }
+            
+            return $api_data;
+        }
+        
+        return $cached_data;
+    }
+    
+    /**
+     * Fazer requisição para API
+     */
+    private static function make_api_request($api_name, $endpoint, $params) {
+        try {
+            switch ($api_name) {
+                case 'awin':
+                    $api = new \CPZCB\app\APIs\Awin\API();
+                    return $api->$endpoint($params);
+                    
+                case 'admitad':
+                    $api = new \CPZCB\app\APIs\Admitad\API();
+                    return $api->$endpoint($params);
+                    
+                case 'afilio':
+                    $api = new \CPZCB\app\APIs\Afilio\API();
+                    return $api->$endpoint($params);
+                    
+                case 'socialsoul':
+                    $api = new \CPZCB\app\APIs\SocialSoul\API();
+                    return $api->$endpoint($params);
+                    
+                default:
+                    return false;
+            }
+        } catch (Exception $e) {
+            \CPZCB\Logging\Logger::error("API Request Failed", [
+                'api' => $api_name,
+                'endpoint' => $endpoint,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+}
+```
+
+---
+
+## 🔄 **SISTEMA DE FALLBACK**
+
+### **1. APIFallback**
+```php
+<?php
+namespace CPZCB\APIManager;
+
+class APIFallback {
+    private static $fallback_strategy = [
+        'awin' => [
+            'primary' => 'awin',
+            'fallbacks' => ['admitad', 'afilio', 'socialsoul'],
+            'timeout' => 10
+        ],
+        'admitad' => [
+            'primary' => 'admitad',
+            'fallbacks' => ['awin', 'socialsoul', 'afilio'],
+            'timeout' => 10
+        ],
+        'afilio' => [
+            'primary' => 'afilio',
+            'fallbacks' => ['awin', 'admitad', 'socialsoul'],
+            'timeout' => 10
+        ],
+        'socialsoul' => [
+            'primary' => 'socialsoul',
+            'fallbacks' => ['awin', 'admitad', 'afilio'],
+            'timeout' => 10
+        ]
+    ];
+    
+    /**
+     * Obter dados com fallback
+     */
+    public static function get_data_with_fallback($api_name, $endpoint, $params = []) {
+        $strategy = self::$fallback_strategy[$api_name] ?? null;
+        if (!$strategy) {
+            return false;
+        }
+        
+        // Tentar API primária
+        $data = self::try_api($api_name, $endpoint, $params);
+        if ($data) {
+            return $data;
+        }
+        
+        // Tentar APIs de fallback
+        foreach ($strategy['fallbacks'] as $fallback_api) {
+            $data = self::try_api($fallback_api, $endpoint, $params);
+            if ($data) {
+                \CPZCB\Logging\Logger::info("Using fallback API", [
+                    'original_api' => $api_name,
+                    'fallback_api' => $fallback_api,
+                    'endpoint' => $endpoint
+                ]);
+                return $data;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Tentar fazer requisição para uma API
+     */
+    private static function try_api($api_name, $endpoint, $params) {
+        try {
+            // Verificar se API está saudável
+            if (!\CPZCB\APIManager\APIMonitor::check_api_health($api_name)) {
+                return false;
+            }
+            
+            // Verificar rate limiting
+            if (!\CPZCB\APIManager\RateLimiter::can_make_request($api_name)) {
+                return false;
+            }
+            
+            // Fazer requisição
+            return \CPZCB\APIManager\APICache::get_api_data($api_name, $endpoint, $params);
+            
+        } catch (Exception $e) {
+            \CPZCB\Logging\Logger::error("API Fallback Failed", [
+                'api' => $api_name,
+                'endpoint' => $endpoint,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+}
+```
+
+---
+
+## 📈 **SISTEMA DE ANALYTICS**
+
+### **1. AnalyticsManager**
+```php
+<?php
+namespace CPZCB\Analytics;
+
+class AnalyticsManager {
+    const TABLE_NAME = 'cpzcb_analytics';
+    
+    /**
+     * Registrar clique em cupom
+     */
+    public static function track_coupon_click($coupon_id, $user_id = null) {
+        $data = [
+            'action' => 'coupon_click',
+            'coupon_id' => $coupon_id,
+            'user_id' => $user_id ?: get_current_user_id(),
+            'timestamp' => current_time('mysql'),
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+            'referer' => $_SERVER['HTTP_REFERER'] ?? ''
+        ];
+        
+        return self::insert_analytics($data);
+    }
+    
+    /**
+     * Registrar visita em loja
+     */
+    public static function track_store_visit($store_id, $user_id = null) {
+        $data = [
+            'action' => 'store_visit',
+            'store_id' => $store_id,
+            'user_id' => $user_id ?: get_current_user_id(),
+            'timestamp' => current_time('mysql'),
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ];
+        
+        return self::insert_analytics($data);
+    }
+    
+    /**
+     * Registrar requisição de API
+     */
+    public static function track_api_request($api_name, $endpoint, $success, $response_time = 0) {
+        $data = [
+            'action' => $success ? 'api_request' : 'api_error',
+            'api_name' => $api_name,
+            'endpoint' => $endpoint,
+            'user_id' => get_current_user_id(),
+            'timestamp' => current_time('mysql'),
+            'response_time' => $response_time,
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? ''
+        ];
+        
+        return self::insert_analytics($data);
+    }
+    
+    /**
+     * Obter cupons populares
+     */
+    public static function get_popular_coupons($limit = 10) {
+        global $wpdb;
+        $table = $wpdb->prefix . self::TABLE_NAME;
+        
+        return $wpdb->get_results($wpdb->prepare("
+            SELECT coupon_id, COUNT(*) as clicks
+            FROM {$table}
+            WHERE action = 'coupon_click'
+            AND timestamp >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            GROUP BY coupon_id
+            ORDER BY clicks DESC
+            LIMIT %d
+        ", $limit));
+    }
+    
+    /**
+     * Inserir dados de analytics
+     */
+    private static function insert_analytics($data) {
+        global $wpdb;
+        $table = $wpdb->prefix . self::TABLE_NAME;
+        
+        return $wpdb->insert($table, $data);
+    }
+}
+```
+
+---
+
+## 🚀 **COMO USAR EM OUTROS PROJETOS**
+
+### **1. Estrutura de Diretórios**
+```
+seu-projeto/
+├── App/
+│   ├── Config/
+│   │   └── APICredentials.php
+│   ├── APIManager/
+│   │   ├── APIMonitor.php
+│   │   ├── RateLimiter.php
+│   │   ├── APICache.php
+│   │   ├── APIFallback.php
+│   │   └── APIDashboard.php
+│   ├── APIs/
+│   │   ├── APIInterface.php
+│   │   ├── SuaAPI1/
+│   │   │   ├── API.php
+│   │   │   └── Prepare.php
+│   │   └── SuaAPI2/
+│   │       ├── API.php
+│   │       └── Prepare.php
+│   ├── Cache/
+│   │   └── CacheManager.php
+│   ├── Logging/
+│   │   └── Logger.php
+│   └── Analytics/
+│       └── AnalyticsManager.php
+└── RestClient.php
+```
+
+### **2. Implementação Básica**
+```php
+<?php
+// Exemplo de uso em outro projeto
+
+// 1. Inicializar API
+$awin_api = new \SeuProjeto\APIs\Awin\API();
+
+// 2. Verificar saúde da API
+$health = \SeuProjeto\APIManager\APIMonitor::check_api_health('awin');
+
+// 3. Fazer requisição com cache e fallback
+$advertisers = \SeuProjeto\APIManager\APIFallback::get_data_with_fallback(
+    'awin', 
+    'advertisers', 
+    ['limit' => 50]
+);
+
+// 4. Registrar analytics
+\SeuProjeto\Analytics\AnalyticsManager::track_api_request(
+    'awin', 
+    'advertisers', 
+    true, 
+    1.5
+);
+```
+
+### **3. Configuração no wp-config.php**
+```php
+// Configurações de APIs
+define('SEU_PROJETO_AWIN_TOKEN', 'seu_token_aqui');
+define('SEU_PROJETO_ADMITAD_CLIENT_ID', 'seu_client_id');
+define('SEU_PROJETO_DEBUG', true);
+define('SEU_PROJETO_DETAILED_LOGGING', true);
+```
+
+---
+
+## 📋 **CHECKLIST DE IMPLEMENTAÇÃO**
+
+### **✅ Passos para Replicar:**
+
+1. **Criar estrutura de diretórios**
+2. **Implementar RestClient base**
+3. **Criar classes específicas para cada API**
+4. **Implementar sistema de credenciais**
+5. **Adicionar monitoramento de APIs**
+6. **Implementar rate limiting**
+7. **Adicionar sistema de cache**
+8. **Implementar fallback**
+9. **Adicionar analytics**
+10. **Configurar logging**
+
+### **✅ Benefícios da Arquitetura:**
+
+- **Modularidade** - Cada API é independente
+- **Escalabilidade** - Fácil adicionar novas APIs
+- **Robustez** - Fallback e monitoramento
+- **Performance** - Cache e rate limiting
+- **Manutenibilidade** - Código organizado e documentado
+- **Segurança** - Credenciais centralizadas
+
+---
+
+**🎯 Esta arquitetura pode ser replicada em qualquer projeto WordPress que precise integrar com múltiplas APIs externas de forma robusta e profissional.** 
